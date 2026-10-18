@@ -107,6 +107,7 @@
     function openToc() {
         $('#tocSidebar').classList.add('open');
         $('#tocOverlay').classList.add('visible');
+        if (window.EBOOK_ANALYTICS) EBOOK_ANALYTICS.tocOpen();
     }
     function closeToc() {
         $('#tocSidebar').classList.remove('open');
@@ -115,6 +116,7 @@
     function openSettings() {
         $('#settingsPanel').classList.add('open');
         $('#settingsOverlay').classList.add('visible');
+        if (window.EBOOK_ANALYTICS) EBOOK_ANALYTICS.settingsOpen();
     }
     function closeSettings() {
         $('#settingsPanel').classList.remove('open');
@@ -129,6 +131,7 @@
             : 'https://moniruzjaman.github.io/self-learning/';
         // Hide native share button if unsupported
         $('#btnNativeShare').style.display = EBOOK_SHARE.isNativeSupported() ? '' : 'none';
+        if (window.EBOOK_ANALYTICS) EBOOK_ANALYTICS.shareModalOpen(chapterId);
     }
     function closeShare() {
         $('#shareModal').classList.remove('visible');
@@ -187,6 +190,7 @@
             } else {
                 EBOOK_TTS.pause();
                 setAudioPlayIcon(false);
+                if (window.EBOOK_ANALYTICS) EBOOK_ANALYTICS.ttsPause(chapterId);
             }
             return;
         }
@@ -208,6 +212,7 @@
             setAudioPlayIcon(false);
             state.audio.isPlaying = false;
             updateAudioProgress(100);
+            if (window.EBOOK_ANALYTICS) EBOOK_ANALYTICS.ttsComplete(cid);
             setTimeout(() => {
                 if (EBOOK_TTS.currentChapter === cid) {
                     updateAudioProgress(0);
@@ -215,13 +220,8 @@
             }, 1500);
         };
 
-        // If no Bengali voice, warn once
-        if (!EBOOK_TTS.hasBengaliVoice() && !sessionStorage.getItem('bn-voice-warned')) {
-            sessionStorage.setItem('bn-voice-warned', '1');
-            console.warn('No Bengali TTS voice found on this device. The audio may use a default voice. To enable proper Bengali narration, install a Bengali voice in your OS settings (Android: Settings → Languages → Bengali; iOS: Settings → Accessibility → Spoken Content → Voices → Bengali; Windows: Settings → Time & Language → Speech → Add Bengali).');
-        }
-
         EBOOK_TTS.play(chapterId, ch.ttsText, { speed: state.audio.speed });
+        if (window.EBOOK_ANALYTICS) EBOOK_ANALYTICS.ttsPlay(chapterId, ch.title);
     }
 
     function stopAudio() {
@@ -252,6 +252,7 @@
             }
         }
         if (current && current.id !== state.currentChapter) {
+            const prevChapter = state.currentChapter;
             state.currentChapter = current.id;
             updateActiveToc(current.id);
             // Update topbar title
@@ -260,6 +261,26 @@
                 $('#topbarChapter').textContent = data.num + ' · ' + (current.querySelector('.chapter-title')?.textContent || '');
             } else if (current.id === 'hero') {
                 $('#topbarChapter').textContent = EBOOK_CONTENT.subtitle;
+            }
+            // Analytics: chapter_read event when entering a chapter
+            if (current.id !== 'hero' && current.id !== prevChapter) {
+                const chTitle = current.querySelector('.chapter-title')?.textContent || current.id;
+                if (window.EBOOK_ANALYTICS) EBOOK_ANALYTICS.chapterRead(current.id, chTitle);
+            }
+        }
+        // Analytics: reading progress (per chapter, milestone-based)
+        if (state.currentChapter && state.currentChapter !== 'hero') {
+            const cur = document.getElementById(state.currentChapter);
+            if (cur) {
+                const rect = cur.getBoundingClientRect();
+                const chHeight = cur.offsetHeight;
+                if (chHeight > 0) {
+                    // % of chapter that has been scrolled past
+                    const scrolledInCh = Math.max(0, -rect.top);
+                    const visiblePortion = Math.min(chHeight, window.innerHeight - rect.top);
+                    const progress = Math.min(100, Math.max(0, (scrolledInCh / (chHeight + window.innerHeight * 0.5)) * 100));
+                    if (window.EBOOK_ANALYTICS) EBOOK_ANALYTICS.readingProgress(state.currentChapter, progress);
+                }
             }
         }
     }
@@ -340,12 +361,15 @@
         $$('.share-btn[data-share]').forEach(btn => {
             btn.addEventListener('click', async () => {
                 const platform = btn.dataset.share;
+                if (window.EBOOK_ANALYTICS) EBOOK_ANALYTICS.shareClick(platform, state.currentChapter);
                 if (platform === 'copy') {
                     const ok = await EBOOK_SHARE.copyLink();
                     btn.querySelector('span').textContent = ok ? 'কপি হয়েছে!' : 'ব্যর্থ';
                     setTimeout(() => btn.querySelector('span').textContent = 'লিঙ্ক কপি', 1500);
+                    if (ok && window.EBOOK_ANALYTICS) EBOOK_ANALYTICS.shareComplete(platform);
                 } else {
                     await EBOOK_SHARE.share(platform, { chapter: state.currentChapter });
+                    if (window.EBOOK_ANALYTICS) EBOOK_ANALYTICS.shareComplete(platform);
                 }
             });
         });
@@ -353,6 +377,10 @@
             const ok = await EBOOK_SHARE.copyLink();
             $('#btnCopyLink').textContent = ok ? '✓ কপি হয়েছে' : '✗ ব্যর্থ';
             setTimeout(() => $('#btnCopyLink').textContent = 'কপি', 1500);
+            if (ok && window.EBOOK_ANALYTICS) {
+                EBOOK_ANALYTICS.shareClick('copy', state.currentChapter);
+                EBOOK_ANALYTICS.shareComplete('copy');
+            }
         });
 
         // Hero buttons
@@ -379,40 +407,59 @@
         // Settings: theme
         $$('.theme-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                state.settings.theme = btn.dataset.theme;
+                const newTheme = btn.dataset.theme;
+                const changed = newTheme !== state.settings.theme;
+                state.settings.theme = newTheme;
                 localStorage.setItem('ebook-theme', state.settings.theme);
                 applySettings();
+                if (changed && window.EBOOK_ANALYTICS) EBOOK_ANALYTICS.themeChange(newTheme);
             });
         });
         // Settings: font
         $$('.font-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                state.settings.font = btn.dataset.font;
+                const newFont = btn.dataset.font;
+                const changed = newFont !== state.settings.font;
+                state.settings.font = newFont;
                 localStorage.setItem('ebook-font', state.settings.font);
                 applySettings();
+                if (changed && window.EBOOK_ANALYTICS) EBOOK_ANALYTICS.fontChange(newFont);
             });
         });
         // Settings: font size
+        let fontSizeDebounce;
         $('#fontSizeRange').addEventListener('input', (e) => {
             state.settings.fontSize = parseInt(e.target.value, 10);
             localStorage.setItem('ebook-fontsize', state.settings.fontSize);
             applySettings();
+            // Debounce analytics to avoid spamming while dragging
+            clearTimeout(fontSizeDebounce);
+            fontSizeDebounce = setTimeout(() => {
+                if (window.EBOOK_ANALYTICS) EBOOK_ANALYTICS.fontSizeChange(state.settings.fontSize);
+            }, 800);
         });
         $('#btnFontInc').addEventListener('click', () => {
             state.settings.fontSize = Math.min(24, state.settings.fontSize + 1);
             localStorage.setItem('ebook-fontsize', state.settings.fontSize);
             applySettings();
+            if (window.EBOOK_ANALYTICS) EBOOK_ANALYTICS.fontSizeChange(state.settings.fontSize);
         });
         $('#btnFontDec').addEventListener('click', () => {
             state.settings.fontSize = Math.max(14, state.settings.fontSize - 1);
             localStorage.setItem('ebook-fontsize', state.settings.fontSize);
             applySettings();
+            if (window.EBOOK_ANALYTICS) EBOOK_ANALYTICS.fontSizeChange(state.settings.fontSize);
         });
         // Settings: line height
+        let lineHtDebounce;
         $('#lineHeightRange').addEventListener('input', (e) => {
             state.settings.lineHeight = parseInt(e.target.value, 10) / 100;
             localStorage.setItem('ebook-lineheight', e.target.value);
             applySettings();
+            clearTimeout(lineHtDebounce);
+            lineHtDebounce = setTimeout(() => {
+                if (window.EBOOK_ANALYTICS) EBOOK_ANALYTICS.lineHeightChange(state.settings.lineHeight);
+            }, 800);
         });
 
         // TOC item clicks (smooth scroll + close sidebar)
@@ -422,10 +469,40 @@
                 e.preventDefault();
                 const target = tocItem.dataset.target;
                 closeToc();
+                if (window.EBOOK_ANALYTICS) EBOOK_ANALYTICS.tocNavigate(target);
                 setTimeout(() => {
                     document.getElementById(target)?.scrollIntoView({ behavior: 'smooth' });
                     history.replaceState(null, '', '#' + target);
                 }, 200);
+            }
+        });
+
+        // Track external link clicks (in Resources / About sections)
+        document.addEventListener('click', (e) => {
+            const a = e.target.closest('a[href^="http"]');
+            if (a && a.href && !a.href.includes('moniruzjaman.github.io')) {
+                if (window.EBOOK_ANALYTICS) EBOOK_ANALYTICS.externalLink(a.href);
+            }
+        });
+
+        // Track action plan checkbox clicks
+        document.addEventListener('click', (e) => {
+            const checkCell = e.target.closest('.action-row .check');
+            if (checkCell) {
+                const row = checkCell.closest('.action-row');
+                const day = row?.querySelector('.day')?.textContent || 'unknown';
+                if (window.EBOOK_ANALYTICS) EBOOK_ANALYTICS.actionPlanCheck(day);
+            }
+        });
+
+        // Track quiz option clicks
+        document.addEventListener('click', (e) => {
+            const opt = e.target.closest('.quiz-options li');
+            if (opt) {
+                const question = opt.closest('.quiz-question');
+                const qNum = question?.querySelector('.qlabel')?.textContent?.match(/\d+/)?.[0] || '0';
+                const answer = opt.textContent.trim().slice(0, 80);
+                if (window.EBOOK_ANALYTICS) EBOOK_ANALYTICS.quizAttempt(qNum, answer);
             }
         });
 
