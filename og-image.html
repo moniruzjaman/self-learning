@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<style>
+@font-face {
+    font-family: 'NotoSansBengali';
+    src: url('assets/NotoSansBengali-Regular.ttf') format('truetype');
+    font-weight: 100 900;
+}
+@font-face {
+    font-family: 'NotoSerifBengali';
+    src: url('assets/NotoSerifBengali-Regular.ttf') format('truetype');
+    font-weight: 100 900;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+    width: 1200px; height: 630px;
+    background: #0E3D22;
+    font-family: 'NotoSansBengali', sans-serif;
+    overflow: hidden;
+}
+.og-card {
+    width: 1200px; height: 630px;
+    background: linear-gradient(135deg, #0E3D22 0%, #145A32 50%, #1E8449 100%);
+    color: #FFFFFF;
+    position: relative;
+    padding: 60px 70px;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    overflow: hidden;
+}
+.og-card::before {
+    content: "";
+    position: absolute;
+    top: -180px; right: -180px;
+    width: 480px; height: 480px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(82, 190, 128, 0.25), transparent 65%);
+    pointer-events: none;
+}
+.og-card::after {
+    content: "";
+    position: absolute;
+    bottom: -200px; left: -200px;
+    width: 520px; height: 520px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 70% 70%, rgba(174, 214, 142, 0.15), transparent 65%);
+    pointer-events: none;
+}
+.og-left {
+    flex: 1.4;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    z-index: 2;
+    padding-right: 40px;
+}
+.og-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    z-index: 2;
+    border-left: 1px solid rgba(169, 223, 191, 0.3);
+    padding-left: 40px;
+}
+.og-tag {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    color: #A9DFBF;
+    border: 1px solid rgba(169, 223, 191, 0.5);
+    padding: 8px 18px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    width: fit-content;
+}
+.og-eyebrow {
+    font-size: 16px;
+    font-weight: 600;
+    color: #A9DFBF;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    margin-top: 28px;
+}
+.og-title {
+    font-family: 'NotoSansBengali', sans-serif;
+    font-size: 68px;
+    font-weight: 900;
+    line-height: 1.05;
+    color: #FFFFFF;
+    margin: 18px 0 22px 0;
+    letter-spacing: -1px;
+}
+.og-rule {
+    width: 100px; height: 5px;
+    background: #A9DFBF;
+    margin: 0 0 22px 0;
+    border-radius: 3px;
+}
+.og-subtitle {
+    font-family: 'NotoSerifBengali', serif;
+    font-size: 22px;
+    font-style: italic;
+    color: #D5F5E3;
+    line-height: 1.4;
+    margin-bottom: 28px;
+}
+.og-features {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.og-feature {
+    font-size: 13px;
+    font-weight: 600;
+    color: #FFFFFF;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(169, 223, 191, 0.4);
+    padding: 8px 14px;
+    border-radius: 6px;
+    backdrop-filter: blur(4px);
+}
+.og-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 28px;
+    padding-top: 22px;
+    border-top: 1px solid rgba(169, 223, 191, 0.3);
+}
+.og-author {
+    font-size: 13px;
+    color: #A9DFBF;
+    letter-spacing: 2px;
+}
+.og-author strong { color: #FFFFFF; font-weight: 700; }
+.og-pub {
+    font-size: 11px;
+    color: #A9DFBF;
+    letter-spacing: 3px;
+    text-align: right;
+    line-height: 1.5;
+}
+
+.og-right-eyebrow {
+    font-size: 11px;
+    color: #A9DFBF;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    text-align: center;
+}
+.og-right-title {
+    font-family: 'NotoSansBengali', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #FFFFFF;
+    text-align: center;
+    line-height: 1.4;
+    margin-bottom: 18px;
+}
+.og-quote {
+    font-family: 'NotoSerifBengali', serif;
+    font-size: 16px;
+    font-style: italic;
+    color: #D5F5E3;
+    line-height: 1.6;
+    text-align: center;
+    padding: 18px 16px;
+    border-top: 1px solid rgba(169, 223, 191, 0.4);
+    border-bottom: 1px solid rgba(169, 223, 191, 0.4);
+    margin: 8px 0 18px 0;
+}
+.og-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-top: 8px;
+}
+.og-stat {
+    text-align: center;
+    padding: 10px 4px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 8px;
+}
+.og-stat-num {
+    font-family: 'NotoSansBengali', sans-serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: #A9DFBF;
+    line-height: 1;
+}
+.og-stat-label {
+    font-size: 10px;
+    color: #D5F5E3;
+    letter-spacing: 1px;
+    margin-top: 4px;
+    text-transform: uppercase;
+}
+.og-cta {
+    margin-top: 22px;
+    padding: 14px 18px;
+    background: #A9DFBF;
+    color: #0E3D22;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+</style>
+</head>
+<body>
+<div class="og-card">
+    <div class="og-left">
+        <div>
+            <div class="og-tag">ই-বুক · ২০২৬</div>
+            <div class="og-eyebrow">কৃষি ও স্বশিক্ষা সিরিজ</div>
+            <h1 class="og-title">স্বশিক্ষা ও<br/>স্বনির্ভরতার<br/>কৃষি</h1>
+            <div class="og-rule"></div>
+            <p class="og-subtitle">একজন কৃষকের জ্ঞান-যাত্রার গল্প</p>
+            <div class="og-features">
+                <span class="og-feature">📖 পড়ুন</span>
+                <span class="og-feature">🎧 শুনুন</span>
+                <span class="og-feature">🔗 শেয়ার করুন</span>
+                <span class="og-feature">✍️ অনুশীলন</span>
+            </div>
+        </div>
+        <div class="og-foot">
+            <div class="og-author">
+                <strong>কৃষি-জ্ঞান সিরিজ</strong><br/>
+                সম্পাদনা ও রচনা
+            </div>
+            <div class="og-pub">
+                বাংলা · bn-BD<br/>
+                বিনামূল্যে · ওপেন অ্যাক্সেস
+            </div>
+        </div>
+    </div>
+    <div class="og-right">
+        <div class="og-right-eyebrow">এই বইয়ে যা আছে</div>
+        <div class="og-right-title">৬টি অধ্যায় · ইন্টারঅ্যাক্টিভ<br/>কুইজ · জমির ডায়েরি</div>
+        <div class="og-quote">
+            "স্বশিক্ষার শুরু ওষুধের নাম জানতে চাওয়া দিয়ে নয়, সমস্যার কারণ জানতে চাওয়া দিয়ে।"
+        </div>
+        <div class="og-stats">
+            <div class="og-stat">
+                <div class="og-stat-num">৬</div>
+                <div class="og-stat-label">অধ্যায়</div>
+            </div>
+            <div class="og-stat">
+                <div class="og-stat-num">২৮</div>
+                <div class="og-stat-label">পৃষ্ঠা</div>
+            </div>
+            <div class="og-stat">
+                <div class="og-stat-num">৭</div>
+                <div class="og-stat-label">দিন পরিকল্পনা</div>
+            </div>
+        </div>
+        <div class="og-cta">এখনই পড়া শুরু করুন →</div>
+    </div>
+</div>
+</body>
+</html>

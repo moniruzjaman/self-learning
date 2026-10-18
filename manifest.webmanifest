@@ -1,0 +1,32 @@
+{
+  "name": "স্বশিক্ষা ও স্বনির্ভরতার কৃষি",
+  "short_name": "স্বশিক্ষা কৃষি",
+  "description": "একজন কৃষকের জ্ঞান-যাত্রার গল্প। বাংলা ই-বুক — পড়ুন, শুনুন, শেয়ার করুন।",
+  "start_url": "/self-learning/",
+  "scope": "/self-learning/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FBFAF6",
+  "theme_color": "#145A32",
+  "lang": "bn-BD",
+  "dir": "ltr",
+  "categories": ["education", "books", "agriculture"],
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "og-image.jpg",
+      "sizes": "1200x630",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}
