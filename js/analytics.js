@@ -1,6 +1,6 @@
 /* ============================================================
    Analytics — Google Analytics 4 event tracking
-   ID: G-559444596
+   ID: G-GJLZ04PSC1
    Tracks: page_view, chapter_read, reading_progress,
            tts_play, tts_pause, tts_complete,
            share_click, share_complete,
@@ -10,7 +10,7 @@
    ============================================================ */
 
 (function () {
-    const GA_ID = 'G-559444596';
+    const GA_ID = 'G-GJLZ04PSC1';
 
     // ── Load GA4 script ────────────────────────────────────────
     function loadGA() {
